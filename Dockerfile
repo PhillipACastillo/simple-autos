@@ -1,9 +1,13 @@
-FROM openjdk:13-alpine
+FROM adoptopenjdk/openjdk11:alpine-jre
 
-VOLUME /tmp
+WORKDIR /app
 
-WORKDIR /
+COPY . .
 
-COPY build/libs/Autos-API-0.0.1-SNAPSHOT.jar springweb.jar
+RUN ./gradlew build -v --stacktrace
 
-CMD java -jar springweb.jar
+EXPOSE 8080
+
+# /app/gradle/wrapper/gradle-wrapper.jar
+
+CMD java -jar $(find /app -type f -name "*.jar")

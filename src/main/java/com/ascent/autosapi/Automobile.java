@@ -1,9 +1,12 @@
 package com.ascent.autosapi;
 
+import java.util.Random;
+
 public class Automobile {
     private int id;
     private String make;
     private String color;
+    private Long vin;
 
     public Automobile() {
     }
@@ -12,17 +15,16 @@ public class Automobile {
         this.id = id;
         this.color = "Color " + id;
         this.make = "Make " + id;
+        this.vin = new Random().nextLong();
     }
 
     public Automobile(int id, String make, String color) {
         this.id = id;
         this.make = make;
         this.color = color;
+        this.vin = new Random().nextLong();
     }
 
-    public int getId() {
-        return id;
-    }
 
     @Override
     public String toString() {
@@ -30,8 +32,19 @@ public class Automobile {
                 "id=" + id +
                 ", make='" + make + '\'' +
                 ", color='" + color + '\'' +
+                ", vin=" + vin +
                 '}';
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public Long getVin() {
+        return vin;
+    }
+
+    public void setVin(Long vin) { this.vin = vin; }
 
     public String getMake() {
         return make;

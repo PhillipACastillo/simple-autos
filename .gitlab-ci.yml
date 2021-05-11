@@ -6,6 +6,8 @@ stages:
   - docker
 build:
   stage: build
+  before_script:
+    - chmod +x ./gradlew
   script:
     ./gradlew assemble
   artifacts:
@@ -13,6 +15,8 @@ build:
       - build/libs/*.jar
 test:
   stage: test
+  before_script:
+    - chmod +x ./gradlew
   script:
     ./gradlew test
   artifacts:

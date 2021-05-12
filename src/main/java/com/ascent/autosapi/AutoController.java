@@ -22,7 +22,9 @@ public class AutoController {
         @RequestParam(required = false) String make) {
         ArrayList<Automobile> automobileList;
 
-         if (color != null && make == null) {
+        if (color != null && make != null) {
+            automobileList = autoService.getAllAutos(color, make);
+        } else if (color != null && make == null) {
             automobileList = autoService.getAllAutos(color);
         } else if (color == null && make != null ) {
              automobileList = autoService.getAllAutos(make);
@@ -87,8 +89,26 @@ public class AutoController {
 
     @DeleteMapping("/autos/{vin}")
     public ResponseEntity<?> deleteAuto(@PathVariable Long vin) {
-        return autoService.deleteByVin(vin) ? ResponseEntity.accepted().build()
-                : ResponseEntity.noContent().build();
+        Automobile auto = autoService.getAutoByVin(vin);
+        if (auto != null){
+            autoService.delete(auto.getVin());
+            return ResponseEntity.accepted().build();
+        }else {
+            return ResponseEntity.noContent().build();
+        }
     }
+    /*
+    @DeleteMapping("/{vin}")
+    public ResponseEntity<String> deleteAuto(@PathVariable String vin){
+        Automobile auto = autosDataService.getAuto(vin);
+        if (auto != null){
+            autosDataService.deleteAuto(vin);
+            return ResponseEntity.accepted().build();
+        }else {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
+     */
 
 }

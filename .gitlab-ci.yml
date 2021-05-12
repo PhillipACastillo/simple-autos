@@ -1,50 +1,26 @@
 stages:
   - build
   - test
-  - coverage
   - docker
 
-build-my-project:
-  image: adoptopenjdk:11
+build:
   stage: build
+  before_script:
+    - chmod +x ./gradlew
   script:
-    - ./gradlew bootJar
-  cache:
-    key: GRADLE-BUILD-FILES
-    paths:
-      - build/
+    ./gradlew assemble
   artifacts:
     paths:
-      - build/classes/java/
       - build/libs/*.jar
-    expire_in: 30 days
-
 test:
-  image: adoptopenjdk:11
-  needs:
-    - build-my-project
   stage: test
+  before_script:
+    - chmod +x ./gradlew
   script:
     ./gradlew test
   artifacts:
     paths:
-      - build/classes/java/
-      - build/test-results/test/*.xml
-
-codeCoverage:
-  image: adoptopenjdk:11
-  needs:
-    - build-my-project
-    - test
-  stage: coverage
-  script:
-    - ./gradlew jacocoTestReport
-    - ./gradlew jacocoTestCoverageVerification
-  allow_failure: true
-  artifacts:
-    when: always
-    paths:
-      - build/reports/jacoco/
+      - build/test-results/test/TEST*.xml
 
 docker:
   image: docker:20

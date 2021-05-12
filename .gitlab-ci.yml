@@ -1,38 +1,64 @@
-image: openjdk:11
-
 stages:
   - build
   - test
+  - coverage
   - docker
-build:
+
+build-my-project:
+  image: adoptopenjdk:11
   stage: build
-  before_script:
-    - chmod +x ./gradlew
   script:
-    ./gradlew assemble
+    - ./gradlew bootJar
+  cache:
+    key: GRADLE-BUILD-FILES
+    paths:
+      - build/
   artifacts:
     paths:
+      - build/classes/java/
       - build/libs/*.jar
+    expire_in: 30 days
+
 test:
+  image: adoptopenjdk:11
+  needs:
+    - build-my-project
   stage: test
-  before_script:
-    - chmod +x ./gradlew
   script:
     ./gradlew test
   artifacts:
     paths:
-      - build/test-results/test/TEST*.xml
+      - build/classes/java/
+      - build/test-results/test/*.xml
+
+codeCoverage:
+  image: adoptopenjdk:11
+  needs:
+    - build-my-project
+    - test
+  stage: coverage
+  script:
+    - ./gradlew jacocoTestReport
+    - ./gradlew jacocoTestCoverageVerification
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - build/reports/jacoco/
+
 docker:
   image: docker:20
   needs:
+    - build-my-project
     - test
   stage: docker
   services:
     - docker:dind
   before_script:
+    - echo "$MY_NAME"
     - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
     - docker build --pull -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .
     - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
-    - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "CI_REGISTRY_IMAGE":"latest"
+    - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
     - docker push "$CI_REGISTRY_IMAGE":"latest"

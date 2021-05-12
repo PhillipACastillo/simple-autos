@@ -11,15 +11,15 @@ public class Automobile {
     public Automobile() {
     }
 
-    public Automobile(int id) {
-        this.id = id;
-        this.color = "Color " + id;
-        this.make = "Make " + id;
-        this.vin = new Random().nextLong();
-    }
+//    public Automobile(int id) {
+//        this.id = id;
+//        this.color = "Color " + id;
+//        this.make = "Make " + id;
+//        this.vin = new Random().nextLong();
+//    }
 
-    public Automobile(int id, String make, String color) {
-        this.id = id;
+    public Automobile(String make, String color) {
+        this.id = new Random().nextInt();
         this.make = make;
         this.color = color;
         this.vin = new Random().nextLong();

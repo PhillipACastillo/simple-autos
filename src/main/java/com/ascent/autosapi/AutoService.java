@@ -37,7 +37,7 @@ public class AutoService {
     }
 
     public Automobile getAutoByVin(Long vin) {
-        Optional<Automobile> auto = autosRepository.findById(vin);
+        Optional<Automobile> auto = autosRepository.findAutomobileByVin(vin);
         return auto.orElse(null);
     }
 
@@ -55,9 +55,10 @@ public class AutoService {
     }
 
     public void delete(Long vin) throws InvalidAutoException {
-        Optional<Automobile> auto = autosRepository.findById(vin);
+         Optional<Automobile> auto = autosRepository.findAutomobileByVin(vin);
         auto.ifPresentOrElse(automobile -> autosRepository.delete(automobile), () -> {
             throw new InvalidAutoException("Invalid Auto");
         });
+
     }
 }

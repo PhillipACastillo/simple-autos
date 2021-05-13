@@ -1,20 +1,54 @@
 package com.ascent.autosapi;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Random;
 
 @Entity
 @Table(name = "automobiles")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+// @JsonPropertyOrder({"searchParameters","size","autos"})
 public class Automobile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String make;
     private String color;
-    private Long vin = new Random().nextLong();
+    private String owner;
+    private int year; //Initialized to zero, if not specified
+    @JsonFormat(pattern = "MM/dd/yyyy")
+    private Date purchaseDate;
+    private Long vin = Math.abs(new Random().nextLong());
     public Automobile() {
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public Date getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(Date purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
 //    public Automobile(int id) {
 //        this.id = id;
 //        this.color = "Color " + id;

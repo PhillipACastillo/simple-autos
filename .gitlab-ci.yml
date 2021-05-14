@@ -59,10 +59,12 @@ docker:
     - docker push "$CI_REGISTRY_IMAGE":"latest"
 production:
   stage: deploy
+  services:
+    - docker:dind
   only:
     - main
   script:
-    - docker login --username=rafaelb24@yahoo.com --password=$HEROKU_API_KEY registry.heroku.com
+    - docker login --username=_rafaelb24@yahoo.com --password=$HEROKU_API_KEY registry.heroku.com
     - docker pull "$CI_REGISTRY_IMAGE":"latest"
     - docker push registry.heroku.com/simple-auto-data/web
     - docker run --rm -e HEROKU_API_KEY=$HEROKU_API_KEY wingrunr21/alpine-heroku-cli container:release web --app simple-auto-data

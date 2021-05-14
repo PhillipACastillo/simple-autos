@@ -68,10 +68,8 @@ docker:
 #  only:
 #    - main
 
-deploy:
+production:
   stage: deploy
-  tags:
-    - docker
   only:
     - master
   script:

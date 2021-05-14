@@ -51,16 +51,16 @@ class AutoServiceTest {
     @DisplayName("It should return two automobiles based on the search critera")
     void getAllAutos_withTwoParams() {
         ArrayList<Automobile> filtered = new ArrayList<>();
-        filtered.add(new Automobile("Jeep", "Yellow"));
-        filtered.add(new Automobile("Jeep", "Yellow"));
+        filtered.add(new Automobile("Yellow", "Jeep"));
+        filtered.add(new Automobile("Yellow", "Jeep"));
         when(autosRepository.findAll()).thenReturn(filtered);
-        assertEquals(2, autoService.getAllAutos("Jeep", "Yellow").size());
+        assertEquals(2, autoService.getAllAutos("Yellow", "Jeep").size());
     }
 
     @Test
     @DisplayName("It should create a new automobile")
     void createNewAuto() {
-        Automobile auto = new Automobile("Mustang Shelby GT 500", "Blue");
+        Automobile auto = new Automobile("Blue","Mustang Shelby GT 500");
 //        when(autosRepository.save((Automobile) any(Automobile.class))).thenReturn(new Automobile("Ford Mustang", "Blue"));
 //        assertNotNull(autoService.createNewAuto((Automobile) any(Automobile.class)));
         when(autosRepository.save(auto)).thenReturn(auto);

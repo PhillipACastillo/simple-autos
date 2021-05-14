@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Random;
 
 @Entity
@@ -56,11 +57,10 @@ public class Automobile {
 //        this.vin = new Random().nextLong();
 //    }
 
-    public Automobile(String make, String color) {
+    public Automobile(String color, String make) {
         this.id = new Random().nextInt();
         this.make = make;
         this.color = color;
-//        this.vin =  1L + (long) (Math.random() * (1000L - 1L));
     }
 
 
@@ -70,8 +70,24 @@ public class Automobile {
                 "id=" + id +
                 ", make='" + make + '\'' +
                 ", color='" + color + '\'' +
+                ", owner='" + owner + '\'' +
+                ", year=" + year +
+                ", purchaseDate=" + purchaseDate +
                 ", vin=" + vin +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Automobile)) return false;
+        Automobile that = (Automobile) o;
+        return id == that.id && year == that.year && make.equals(that.make) && color.equals(that.color) && owner.equals(that.owner) && purchaseDate.equals(that.purchaseDate) && vin.equals(that.vin);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, make, color, owner, year, purchaseDate, vin);
     }
 
     public int getId() {

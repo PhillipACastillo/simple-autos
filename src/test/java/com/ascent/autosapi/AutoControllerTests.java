@@ -59,8 +59,8 @@ public class AutoControllerTests {
     void findAllAutomobilesWithColorCriteria() throws Exception {
         // SETUP
         String searchColor = "green";
-        Automobile mercedes = new Automobile( "Mercedes", "green");
-        Automobile porsche = new Automobile("Porsche", "green");
+        Automobile mercedes = new Automobile(searchColor, "Mercedes");
+        Automobile porsche = new Automobile(searchColor, "Porsche");
         automobiles.add(mercedes);
         automobiles.add(porsche);
 
@@ -114,7 +114,7 @@ public class AutoControllerTests {
     @Test
     @DisplayName("It should return a particular automobile based on vin")
     void getAutomobileByVin() throws Exception {
-        Automobile automobile = new Automobile("Honda", "red");
+        Automobile automobile = new Automobile("Red", "Honda");
         when(autoService.getAutoByVin(anyLong())).thenReturn(automobile);
         mockMvc.perform(get("/api/autos/" + automobile.getVin()))
                 .andExpect(status().isOk())
@@ -133,20 +133,20 @@ public class AutoControllerTests {
     @Test
     @DisplayName("It should return JSON of updated auto based on vin")
     void updateAutomobileByVin() throws Exception {
-        Automobile automobile = new Automobile("Honda", "red");
+        Automobile automobile = new Automobile("Red", "Honda");
         when(autoService.updateAuto(anyLong(), anyMap())).thenReturn(automobile);
         mockMvc.perform(patch("/api/autos/" + automobile.getVin())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(automobile)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("color", is("red")));
+                .andExpect(jsonPath("color", is("Red")));
     }
     //         - PATCH: /api/autos/{vin} returns a status code of 204 when there are no automobiles matching vin in the database (STATUS CODE: 204)
     @Test
     @DisplayName("It should return a status code of 204 when no automobiles match vin")
     void updateAutomobileByVin_noMatchingVin() throws Exception {
         when(autoService.updateAuto(anyLong(), anyMap())).thenReturn(null);
-        Automobile automobile = new Automobile("Honda", "red");
+        Automobile automobile = new Automobile("Red", "Honda");
         mockMvc.perform(patch("/api/autos/234234")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(automobile)))

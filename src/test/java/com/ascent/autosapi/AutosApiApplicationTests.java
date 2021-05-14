@@ -39,11 +39,11 @@ class AutosApiApplicationTests {
         String[] colors = {"Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Indigo"};
         String[] make = {"Ford", "Mazda", "Dodge", "Tesla", "BMW", "Mercedes", "Nissan"};
         IntStream.range(1, 26).forEach((num) -> {
-            automobiles.add(new Automobile(make[r.nextInt(7)], colors[r.nextInt(7)]));
+            automobiles.add(new Automobile(colors[r.nextInt(7)], make[r.nextInt(7)]));
         });
 
-        automobiles.add(new Automobile("Mazda", "Red"));
-        automobiles.add(new Automobile("Mazda", "Red"));
+        automobiles.add(new Automobile("Red", "Mazda"));
+        automobiles.add(new Automobile("Red", "Mazda"));
         autosRepository.saveAll(automobiles);
     }
 
@@ -65,7 +65,7 @@ class AutosApiApplicationTests {
     @DisplayName("It should return autos with a specific make and color from the autos repository")
     void getAutos_getAutosWithParams() {
         ResponseEntity<Automobile[]> response = restTemplate.getForEntity(
-                "/api/autos?color=Red&make=Mazda", Automobile[].class);
+                "/api/autos?make=Mazda&color=Red", Automobile[].class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Arrays.stream(response.getBody()).count()).isGreaterThanOrEqualTo(1);
     }

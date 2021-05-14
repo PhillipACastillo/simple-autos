@@ -29,6 +29,8 @@ codeCoverage:
     - build
     - test
   stage: coverage
+  before_script:
+    - chmod +x ./gradlew
   script:
     - ./gradlew jacocoTestReport
     - ./gradlew jacocoTestCoverageVerification

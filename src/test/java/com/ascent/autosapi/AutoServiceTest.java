@@ -51,16 +51,16 @@ class AutoServiceTest {
     @DisplayName("It should return two automobiles based on the search critera")
     void getAllAutos_withTwoParams() {
         ArrayList<Automobile> filtered = new ArrayList<>();
-        filtered.add(new Automobile("Jeep", "Yellow"));
-        filtered.add(new Automobile("Jeep", "Yellow"));
+        filtered.add(new Automobile("Yellow", "Jeep"));
+        filtered.add(new Automobile("Yellow", "Jeep"));
         when(autosRepository.findAll()).thenReturn(filtered);
-        assertEquals(2, autoService.getAllAutos("Jeep", "Yellow").size());
+        assertEquals(2, autoService.getAllAutos("Yellow", "Jeep").size());
     }
 
     @Test
     @DisplayName("It should create a new automobile")
     void createNewAuto() {
-        Automobile auto = new Automobile("Mustang Shelby GT 500", "Blue");
+        Automobile auto = new Automobile("Blue","Mustang Shelby GT 500");
 //        when(autosRepository.save((Automobile) any(Automobile.class))).thenReturn(new Automobile("Ford Mustang", "Blue"));
 //        assertNotNull(autoService.createNewAuto((Automobile) any(Automobile.class)));
         when(autosRepository.save(auto)).thenReturn(auto);
@@ -70,36 +70,36 @@ class AutoServiceTest {
     @Test
     @DisplayName("It should retrieve the correct automobile with a given VIN")
     void getAutoByVin() {
-        Optional<Automobile> auto = Optional.of(new Automobile("Mustang Shelby GT 500", "Blue"));
-        when(autosRepository.findById(anyLong())).thenReturn(auto);
+        Optional<Automobile> auto = Optional.of (new Automobile("Mustang Shelby GT 500", "Blue"));
+        when(autosRepository.findAutomobileByVin(anyLong())).thenReturn(auto);
         assertEquals(auto.get(), autoService.getAutoByVin(anyLong()));
     }
 
     @Test
     void updateAuto() {
         Optional<Automobile> auto = Optional.of(new Automobile("Mustang Shelby GT 500", "Blue"));
-        when(autosRepository.findById(anyLong())).thenReturn(auto);
+        when(autosRepository.findAutomobileByVin(anyLong())).thenReturn(auto);
 
         // Refactor tests and change fields to see if update changed our auto instance
         auto.get().setColor("Red");
         when(autosRepository.save(auto.get())).thenReturn(auto.get());
-        assertEquals(auto.get(), autoService.updateAuto(1L, new HashMap<>()));
+        assertEquals(auto.get(), autoService.updateAuto(anyLong(), new HashMap<>()));
     }
 
     @Test
     @DisplayName("It should delete automobile by vin")
     void deleteByVin() {
         Optional<Automobile> auto = Optional.of(new Automobile("Mustang Shelby GT 500", "Blue"));
-        when(autosRepository.findById(anyLong())).thenReturn(auto);
+        when(autosRepository.findAutomobileByVin(anyLong())).thenReturn(auto);
         autoService.delete(auto.get().getVin());
         verify(autosRepository).delete(auto.get());
     }
 
     @Test
-    @DisplayName("It should return false when trying to delete an auto that doesn't exist")
+    @DisplayName("It should throw error when trying to delete an auto that doesn't exist")
     void deleteByVin_noVin() {
-//        Optional<Automobile> auto = Optional.of(new Automobile("Mustang Shelby GT 500", "Blue"));
-        when(autosRepository.findById(anyLong())).thenReturn(Optional.empty());
+  //      Optional<Automobile> auto = Optional.of(new Automobile("Mustang Shelby GT 500", "Blue"));
+        when(autosRepository.findAutomobileByVin(anyLong())).thenReturn(Optional.empty());
         assertThatExceptionOfType(InvalidAutoException.class)
                 .isThrownBy(() -> {
                     autoService.delete(anyLong());

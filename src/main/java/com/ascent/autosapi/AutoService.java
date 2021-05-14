@@ -25,19 +25,18 @@ public class AutoService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public ArrayList<Automobile> getAllAutos(String make, String color) {
+    public ArrayList<Automobile> getAllAutos(String color, String make) {
         return new ArrayList<>(autosRepository.findAll()).stream()
                 .filter(automobile -> automobile.getColor().equals(color) && automobile.getMake().equals(make))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
-
 
     public Automobile createNewAuto(Automobile automobile) {
         return autosRepository.save(automobile);
     }
 
     public Automobile getAutoByVin(Long vin) {
-        Optional<Automobile> auto = autosRepository.findById(vin);
+        Optional<Automobile> auto = autosRepository.findAutomobileByVin(vin);
         return auto.orElse(null);
     }
 
@@ -55,9 +54,10 @@ public class AutoService {
     }
 
     public void delete(Long vin) throws InvalidAutoException {
-        Optional<Automobile> auto = autosRepository.findById(vin);
+         Optional<Automobile> auto = autosRepository.findAutomobileByVin(vin);
         auto.ifPresentOrElse(automobile -> autosRepository.delete(automobile), () -> {
             throw new InvalidAutoException("Invalid Auto");
         });
+
     }
 }

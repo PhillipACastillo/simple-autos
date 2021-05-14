@@ -3,6 +3,7 @@ package com.ascent.autosapi;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -39,6 +41,9 @@ class AutosApiApplicationTests {
         IntStream.range(1, 26).forEach((num) -> {
             automobiles.add(new Automobile(make[r.nextInt(7)], colors[r.nextInt(7)]));
         });
+
+        automobiles.add(new Automobile("Mazda", "Red"));
+        automobiles.add(new Automobile("Mazda", "Red"));
         autosRepository.saveAll(automobiles);
     }
 
@@ -54,5 +59,14 @@ class AutosApiApplicationTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("It should return autos with a specific make and color from the autos repository")
+    void getAutos_getAutosWithParams() {
+        ResponseEntity<Automobile[]> response = restTemplate.getForEntity(
+                "/api/autos?color=Red&make=Mazda", Automobile[].class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Arrays.stream(response.getBody()).count()).isGreaterThanOrEqualTo(1);
     }
 }

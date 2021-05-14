@@ -25,12 +25,11 @@ public class AutoService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public ArrayList<Automobile> getAllAutos(String make, String color) {
+    public ArrayList<Automobile> getAllAutos(String color, String make) {
         return new ArrayList<>(autosRepository.findAll()).stream()
                 .filter(automobile -> automobile.getColor().equals(color) && automobile.getMake().equals(make))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
-
 
     public Automobile createNewAuto(Automobile automobile) {
         return autosRepository.save(automobile);

@@ -61,6 +61,8 @@ production:
   stage: deploy
   services:
     - docker:dind
+  tags:
+    - docker
   only:
     - main
   script:

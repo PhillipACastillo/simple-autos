@@ -5,32 +5,17 @@ stages:
   - test
   - coverage
   - docker
- # - deploy
-  - release
-#build:
-#  stage: build
-#  before_script:
-#    - chmod +x ./gradlew
-#  script:
-#    ./gradlew assemble
-#  artifacts:
-#    paths:
-#      - build/libs/*.jar
+  - deploy
+ # - release
 build:
-  only:
-    - main
-  image: registry.gitlab.com/majorhayden/container-buildah
   stage: build
-  variables:
-    STORAGE_DRIVER: "vfs"
-    BUILDAH_FORMAT: "docker"
   before_script:
-    - dnf install -y nodejs
-    - curl https://cli-assets.heroku.com/install.sh | sh
-    - sed -i '/^mountopt =.*/d' /etc/containers/storage.conf
+    - chmod +x ./gradlew
   script:
-    - buildah bud --iidfile iidfile -t simple-autos-data:$CI_COMMIT_SHORT_SHA .
-    - buildah push --creds=_:$(heroku auth:token) $(cat iidfile) registry.heroku.com/simple-auto-data/web
+    ./gradlew assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
 test:
   stage: test
   before_script:
@@ -82,14 +67,50 @@ docker:
 #    - dpl --provider=heroku --app=simple-auto-data --api-key=$HEROKU_API_KEY
 #  only:
 #    - main
-release:
-  only:
-    - main
-  image: adoptopenjdk/openjdk11:alpine-jre
-  stage: release
-  before_script:
-    - apk add curl bash
-    - curl https://cli-assets.heroku.com/install.sh | sh
-  script:
-    - heroku container:release web --app simple-auto-data
 
+deploy:
+  stage: deploy
+  tags:
+    - docker
+  only:
+    - master
+  script:
+    - docker login --username=rafaelb24@yahoo.com --password=$HEROKU_API_KEY registry.heroku.com
+    - docker pull "$CI_REGISTRY_IMAGE":"latest"
+    - docker push registry.heroku.com/simple-auto-data/web
+    - docker run --rm -e HEROKU_API_KEY=$HEROKU_API_KEY wingrunr21/alpine-heroku-cli container:release web --app simple-auto-data
+
+
+#release:
+#  only:
+#    - main
+#  image: adoptopenjdk/openjdk11:alpine-jre
+#  stage: release
+#  before_script:
+#    - apk add curl bash
+#    - curl https://cli-assets.heroku.com/install.sh | sh
+#  script:
+#    - docker login --username=rafaelb24@yahoo.com --password=$HEROKU_API_KEY registry.heroku.com
+#    - docker pull "$CI_REGISTRY_IMAGE":"latest"
+#    - docker push registry.heroku.com/simple-auto-data/web
+#    - docker run --rm -e HEROKU_API_KEY=$HEROKU_API_KEY wingrunr21/alpine-heroku-cli container:release web --app simple-auto-data
+
+
+#    - heroku container:push web --app simple-auto-data
+#    - heroku container:release web --app simple-auto-data
+
+#- docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+
+
+#deploy_stg:
+#  stage: deploy
+#  tags:
+#    - docker
+#  only:
+#    - master
+#  script:
+#    - docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+#    - docker pull $CONTAINER_IMAGE:staging
+#    - docker tag $CONTAINER_IMAGE:staging registry.heroku.com/django-cloud/web
+#    - docker push registry.heroku.com/django-cloud/web
+#    - docker run --rm -e HEROKU_API_KEY=$HEROKU_API_KEY wingrunr21/alpine-heroku-cli container:release web --app django-cloud

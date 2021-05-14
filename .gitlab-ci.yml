@@ -5,16 +5,32 @@ stages:
   - test
   - coverage
   - docker
-  - deploy
+ # - deploy
+  - release
+#build:
+#  stage: build
+#  before_script:
+#    - chmod +x ./gradlew
+#  script:
+#    ./gradlew assemble
+#  artifacts:
+#    paths:
+#      - build/libs/*.jar
 build:
+  only:
+    - main
+  image: registry.gitlab.com/majorhayden/container-buildah
   stage: build
+  variables:
+    STORAGE_DRIVER: "vfs"
+    BUILDAH_FORMAT: "docker"
   before_script:
-    - chmod +x ./gradlew
+    - dnf install -y nodejs
+    - curl https://cli-assets.heroku.com/install.sh | sh
+    - sed -i '/^mountopt =.*/d' /etc/containers/storage.conf
   script:
-    ./gradlew assemble
-  artifacts:
-    paths:
-      - build/libs/*.jar
+    - buildah bud --iidfile iidfile -t simple-autos-data:$CI_COMMIT_SHORT_SHA .
+    - buildah push --creds=_:$(heroku auth:token) $(cat iidfile) registry.heroku.com/simple-auto-data/web
 test:
   stage: test
   before_script:
@@ -56,14 +72,24 @@ docker:
     - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
     - docker push "$CI_REGISTRY_IMAGE":"latest"
-production:
-  stage: deploy
-  image: ruby:latest
-  script:
-    - apt-get update -qy
-    - apt-get install -y ruby-dev
-    - gem install dpl
-    #                        App name from prev step  Key from your heroku account
-    - dpl --provider=heroku --app=simple-auto-data --api-key=$HEROKU_API_KEY
-  only: # Heroku will ONLY deploy from main or master branch!
+#production:
+#  stage: deploy
+#  image: ruby:latest
+#  script:
+#    - apt-get update -qy
+#    - apt-get install -y ruby-dev
+#    - gem install dpl
+#    - dpl --provider=heroku --app=simple-auto-data --api-key=$HEROKU_API_KEY
+#  only:
+#    - main
+release:
+  only:
     - main
+  image: adoptopenjdk/openjdk11:alpine-jre
+  stage: release
+  before_script:
+    - apk add curl bash
+    - curl https://cli-assets.heroku.com/install.sh | sh
+  script:
+    - heroku container:release web --app simple-auto-data
+

@@ -23,6 +23,7 @@ public class Automobile {
     private int year; //Initialized to zero, if not specified
     @JsonFormat(pattern = "MM/dd/yyyy")
     private Date purchaseDate;
+    @Column(unique = true)
     private Long vin = Math.abs(new Random().nextLong());
     public Automobile() {
     }

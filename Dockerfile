@@ -12,7 +12,7 @@
 #
 #CMD java -jar $(find /app -type f -name "*.jar")
 
-FROM openjdk:8-jdk-alpine
+FROM adoptopenjdk/openjdk11:alpine-jre
 WORKDIR /app
 COPY build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

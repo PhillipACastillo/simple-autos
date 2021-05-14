@@ -5,6 +5,7 @@ stages:
   - test
   - coverage
   - docker
+  - deploy
 build:
   stage: build
   before_script:
@@ -55,3 +56,14 @@ docker:
     - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
     - docker push "$CI_REGISTRY_IMAGE":"latest"
+production:
+  stage: deploy
+  image: ruby:latest
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    #                        App name from prev step  Key from your heroku account
+    - dpl --provider=heroku --app=simple-auto-data --api-key=$HEROKU_API_KEY
+  only: # Heroku will ONLY deploy from main or master branch!
+    - main

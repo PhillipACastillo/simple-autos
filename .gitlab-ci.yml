@@ -57,58 +57,12 @@ docker:
     - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
     - docker push "$CI_REGISTRY_IMAGE":"latest"
-#production:
-#  stage: deploy
-#  image: ruby:latest
-#  script:
-#    - apt-get update -qy
-#    - apt-get install -y ruby-dev
-#    - gem install dpl
-#    - dpl --provider=heroku --app=simple-auto-data --api-key=$HEROKU_API_KEY
-#  only:
-#    - main
-
 production:
   stage: deploy
   only:
-    - master
+    - main
   script:
     - docker login --username=rafaelb24@yahoo.com --password=$HEROKU_API_KEY registry.heroku.com
     - docker pull "$CI_REGISTRY_IMAGE":"latest"
     - docker push registry.heroku.com/simple-auto-data/web
     - docker run --rm -e HEROKU_API_KEY=$HEROKU_API_KEY wingrunr21/alpine-heroku-cli container:release web --app simple-auto-data
-
-
-#release:
-#  only:
-#    - main
-#  image: adoptopenjdk/openjdk11:alpine-jre
-#  stage: release
-#  before_script:
-#    - apk add curl bash
-#    - curl https://cli-assets.heroku.com/install.sh | sh
-#  script:
-#    - docker login --username=rafaelb24@yahoo.com --password=$HEROKU_API_KEY registry.heroku.com
-#    - docker pull "$CI_REGISTRY_IMAGE":"latest"
-#    - docker push registry.heroku.com/simple-auto-data/web
-#    - docker run --rm -e HEROKU_API_KEY=$HEROKU_API_KEY wingrunr21/alpine-heroku-cli container:release web --app simple-auto-data
-
-
-#    - heroku container:push web --app simple-auto-data
-#    - heroku container:release web --app simple-auto-data
-
-#- docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
-
-
-#deploy_stg:
-#  stage: deploy
-#  tags:
-#    - docker
-#  only:
-#    - master
-#  script:
-#    - docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
-#    - docker pull $CONTAINER_IMAGE:staging
-#    - docker tag $CONTAINER_IMAGE:staging registry.heroku.com/django-cloud/web
-#    - docker push registry.heroku.com/django-cloud/web
-#    - docker run --rm -e HEROKU_API_KEY=$HEROKU_API_KEY wingrunr21/alpine-heroku-cli container:release web --app django-cloud

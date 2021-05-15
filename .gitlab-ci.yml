@@ -118,25 +118,33 @@ codeCoverage:
       - build/reports/jacoco/
 docker:
   image: docker:latest
+  needs:
+    - build
+    - test
+  stage: docker
   services:
     - docker:dind
-  stage: docker
+  before_script:
+    - echo "$MY_NAME"
+    - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    - docker build -t registry.gitlab.com/galv-vmw-apr-2021/2-simple-autos/rafael-phillip .
-    - docker push registry.gitlab.com/galv-vmw-apr-2021/2-simple-autos/rafael-phillip:latest
+    - docker build --pull -t "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" .
+    - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
+    - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
+    - docker push "$CI_REGISTRY_IMAGE":"latest"
 push_to_heroku:
   image: docker:latest
   stage: push
   services:
     - docker:dind
+  before_script:
+    - echo "$MY_NAME"
+    - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    - docker pull registry.gitlab.com/galv-vmw-apr-2021/2-simple-autos/rafael-phillip:latest
+    - docker pull "$CI_REGISTRY_IMAGE":"latest"
     - docker login --username=_$HEROKU_USER --password=$HEROKU_PASSWORD registry.heroku.com
-    - docker tag registry.gitlab.com/galv-vmw-apr-2021/2-simple-autos/rafael-phillip:latest registry.heroku.com/simple-auto-data/web:latest
+    - docker tag "$CI_REGISTRY_IMAGE":"latest" registry.heroku.com/simple-auto-data/web:latest
     - docker push registry.heroku.com/simple-api-data/web:latest
-
 deploy_to_heroku:
   image: node:latest
   stage: deploy

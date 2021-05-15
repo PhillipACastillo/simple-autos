@@ -116,7 +116,7 @@ push_to_heroku:
   script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker pull registry.gitlab.com/galv-vmw-apr-2021/2-simple-autos/rafael-phillip:latest
-    - docker login --username=_ --password=<a password> registry.heroku.com
+    - docker login --username=_$HEROKU_USER --password=$HEROKU_PASSWORD registry.heroku.com
     - docker tag registry.gitlab.com/galv-vmw-apr-2021/2-simple-autos/rafael-phillip:latest registry.heroku.com/simple-auto-data/web:latest
     - docker push registry.heroku.com/simple-api-data/web:latest
 

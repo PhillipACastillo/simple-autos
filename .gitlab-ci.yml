@@ -142,7 +142,7 @@ push_to_heroku:
     - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
     - docker pull "$CI_REGISTRY_IMAGE":"latest"
-    - docker login --username=_$HEROKU_USER --password=$HEROKU_PASSWORD registry.heroku.com
+    - docker login --username=_$HEROKU_USER --password=$HEROKU_API_KEY registry.heroku.com
     - docker tag "$CI_REGISTRY_IMAGE":"latest" registry.heroku.com/simple-auto-data/web:latest
     - docker push registry.heroku.com/simple-api-data/web:latest
 deploy_to_heroku:

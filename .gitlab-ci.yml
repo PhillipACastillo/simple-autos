@@ -144,7 +144,7 @@ push_to_heroku:
     - docker pull "$CI_REGISTRY_IMAGE":"latest"
     - docker login --username=_$HEROKU_USER --password=$HEROKU_API_KEY registry.heroku.com
     - docker tag "$CI_REGISTRY_IMAGE":"latest" registry.heroku.com/simple-auto-data/web:latest
-    - docker push registry.heroku.com/simple-api-data/web:latest
+    - docker push registry.heroku.com/simple-auto-data/web:latest
 deploy_to_heroku:
   image: node:latest
   stage: deploy

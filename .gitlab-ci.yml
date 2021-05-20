@@ -79,7 +79,6 @@ stages:
   - test
   - coverage
   - docker
-  - push
   - deploy
 
 build:
@@ -132,26 +131,19 @@ docker:
     - docker push "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
     - docker tag "$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID" "$CI_REGISTRY_IMAGE":"latest"
     - docker push "$CI_REGISTRY_IMAGE":"latest"
-push_to_heroku:
-  image: docker:latest
-  stage: push
-  services:
-    - docker:dind
-  before_script:
-    - echo "$MY_NAME"
-    - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-  script:
-    - docker pull "$CI_REGISTRY_IMAGE":"latest"
-    - docker login --username=_$HEROKU_USER --password=$HEROKU_API_KEY registry.heroku.com
-    - docker tag "$CI_REGISTRY_IMAGE":"latest" registry.heroku.com/simple-auto-data/web:latest
-    - docker push registry.heroku.com/simple-auto-data/web:latest
-deploy_to_heroku:
-  image: node:latest
+deploy:
   stage: deploy
-  services:
-  - docker:dind
+  image: registry.gitlab.com/galv-vmw-apr-2021/capstone/base-aws-eks-image
+  before_script:
+    - export IMAGE="$CI_REGISTRY_IMAGE":"$CI_PIPELINE_IID"
+    - aws configure set region us-west-2
+    - aws configure set output json
+    - aws eks update-kubeconfig --name "$CLUSTER_NAME"
+    - aws sts get-caller-identity
+
   script:
-    - npm install -g heroku
-    - heroku container:release web --app simple-auto-data
+    - envsubst < k8s-deploy.yaml | kubectl apply -f -
+    - kubectl apply -f k8s-service.yaml
+
 
 
